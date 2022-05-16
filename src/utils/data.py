@@ -23,7 +23,7 @@ def get_dataset(name):
     dataset_url = URLS[name]
     data_dir = tf.keras.utils.get_file(origin=dataset_url, fname=name, untar=True)
     data_dir = pathlib.Path(data_dir)
-    image_count = len(list(data_dir.glob("*/*.jpg")))
+    image_count = len(list(data_dir.glob("**/*.jpg")))
     return data_dir, image_count
 
 
