@@ -12,6 +12,7 @@ from tensorflow.keras.optimizers import SGD
 from tensorflow.python.compiler.mlcompute import mlcompute
 
 from src.models import vgg
+from src.utils.data import get_dataset
 
 
 parser = argparse.ArgumentParser()
@@ -22,6 +23,14 @@ parser.add_argument(
     default="vgg",
     choices=["vgg"],
     help="Type of model architecture to train.",
+)
+parser.add_argument(
+    "-d",
+    "--dataset",
+    type=str,
+    default="dtd",
+    choices=["dtd"],
+    help="Dataset to train.",
 )
 args = vars(parser.parse_args())
 
@@ -51,6 +60,12 @@ if args["model"] == "vgg":
     model = vgg.VGG16(INPUT_DIMS, NUM_CLASSES)
 
 model.summary()
+
+data_dir, img_count = get_dataset(args["dataset"])
+logger.info("Loaded dataset with %d images", img_count)
+
+if args["dataset"] == "dtd":
+    data_dir = data_dir / "images"
 
 optimizer = SGD(lr=LR, momentum=MOMENTUM, decay=LR / NUM_EPOCHS)
 model.compile(
