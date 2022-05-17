@@ -15,6 +15,7 @@ from src.models import vgg
 from src.utils.data import get_dataset
 
 
+# initialize parser
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "-m",
@@ -34,12 +35,15 @@ parser.add_argument(
 )
 args = vars(parser.parse_args())
 
+# initialize logger
 logger = logging.getLogger()
 logger.info("Running on tensorflow v%s", tf.__version__)
 
+# tensorflow settings
 tf.compat.v1.disable_eager_execution()
 mlcompute.set_mlc_device(device_name="gpu")
 
+# log tensorflow settings
 logger.info("Apple MLC enabled: %s", mlcompute.is_apple_mlc_enabled())
 logger.info("Compiled with Apple MLC: %s", mlcompute.is_tf_compiled_with_apple_mlc())
 logger.info("Eager excecution: %s", tf.executing_eagerly())
@@ -56,17 +60,20 @@ NUM_EPOCHS = 60
 INPUT_DIMS = (0, 0, 0)
 NUM_CLASSES = 0
 
+# choose and print model
 if args["model"] == "vgg":
     model = vgg.VGG16(INPUT_DIMS, NUM_CLASSES)
 
 model.summary()
 
+# load dataset
 data_dir, img_count = get_dataset(args["dataset"])
 logger.info("Loaded dataset with %d images", img_count)
 
 if args["dataset"] == "dtd":
     data_dir = data_dir / "images"
 
+# prepare optimizer
 optimizer = SGD(lr=LR, momentum=MOMENTUM, decay=LR / NUM_EPOCHS)
 model.compile(
     loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
