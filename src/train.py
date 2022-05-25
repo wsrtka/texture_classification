@@ -82,7 +82,7 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
     image_size=INPUT_DIMS[:2],
     batch_size=BATCH_SIZE,
 )
-train_ds = tf.keras.utils.image_dataset_from_directory(
+val_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
     subset="validation",
@@ -90,6 +90,11 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
     image_size=INPUT_DIMS[:2],
     batch_size=BATCH_SIZE,
 )
+
+# configure dataset for performance
+AUTOTUNE = tf.data.AUTOTUNE
+train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 # prepare optimizer
 optimizer = SGD(lr=LR, momentum=MOMENTUM, decay=LR / NUM_EPOCHS)
