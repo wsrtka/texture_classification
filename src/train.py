@@ -115,7 +115,9 @@ cp_callback = ModelCheckpoint(
 )
 
 # train model
-training = model.fit(train_ds, validation_data=val_ds, epochs=NUM_EPOCHS)
+training = model.fit(
+    train_ds, validation_data=val_ds, epochs=NUM_EPOCHS, callbacks=[cp_callback]
+)
 
 # save model
 model.save(f'models/{args["model"]}')
