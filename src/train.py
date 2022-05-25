@@ -57,7 +57,7 @@ BATCH_SIZE = 128
 NUM_EPOCHS = 60
 # todo: move this into __init__.py and adjust according to dataset
 # (add option in argparser for this also)
-INPUT_DIMS = (0, 0, 0)
+INPUT_DIMS = (300, 300, 3)
 NUM_CLASSES = 0
 
 # choose and print model
@@ -72,6 +72,24 @@ logger.info("Loaded dataset with %d images", img_count)
 
 if args["dataset"] == "dtd":
     data_dir = data_dir / "images"
+
+# split dataset
+train_ds = tf.keras.utils.image_dataset_from_directory(
+    data_dir,
+    validation_split=0.2,
+    subset="training",
+    seed=123,
+    image_size=INPUT_DIMS[:2],
+    batch_size=BATCH_SIZE,
+)
+train_ds = tf.keras.utils.image_dataset_from_directory(
+    data_dir,
+    validation_split=0.2,
+    subset="validation",
+    seed=123,
+    image_size=INPUT_DIMS[:2],
+    batch_size=BATCH_SIZE,
+)
 
 # prepare optimizer
 optimizer = SGD(lr=LR, momentum=MOMENTUM, decay=LR / NUM_EPOCHS)
