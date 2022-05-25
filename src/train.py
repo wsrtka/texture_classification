@@ -1,7 +1,6 @@
 """Script used to train models for texture classification."""
 
 import argparse
-import logging
 
 import seaborn as sns
 import numpy as np
@@ -12,7 +11,8 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 from src.models import vgg
 from src.utils.data import get_dataset
-from src.utils.visualize import show_dataset
+
+# from src.utils.visualize import show_dataset
 
 
 # initialize parser
@@ -36,11 +36,12 @@ parser.add_argument(
 args = vars(parser.parse_args())
 
 # initialize logger
-logger = logging.getLogger()
+logger = tf.get_logger()
+logger.setLevel("INFO")
 logger.info("Running on tensorflow v%s", tf.__version__)
 
 # tensorflow settings
-tf.compat.v1.disable_eager_execution()
+# tf.compat.v1.disable_eager_execution()
 
 # log tensorflow settings
 logger.info("Eager excecution: %s", tf.executing_eagerly())
@@ -50,18 +51,16 @@ logger.info(tf.config.list_logical_devices())
 # todo: move these options into parser arguments
 LR = 1e-2
 MOMENTUM = 0.9
-BATCH_SIZE = 128
+BATCH_SIZE = 64
 NUM_EPOCHS = 60
 # todo: move this into __init__.py and adjust according to dataset
 # (add option in argparser for this also)
-INPUT_DIMS = (300, 300, 3)
-NUM_CLASSES = 0
+INPUT_DIMS = (150, 150, 3)
+NUM_CLASSES = 47
 
 # choose and print model
 if args["model"] == "vgg":
     model = vgg.VGG16(INPUT_DIMS, NUM_CLASSES)
-
-model.summary()
 
 # load dataset
 data_dir, img_count = get_dataset(args["dataset"])
@@ -88,22 +87,24 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     batch_size=BATCH_SIZE,
 )
 
-show_dataset(train_ds)
+# show_dataset(train_ds)
 
 # configure dataset for performance
-AUTOTUNE = tf.data.AUTOTUNE
-train_ds.cache().prefetch(buffer_size=AUTOTUNE)
-val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+# AUTOTUNE = tf.data.AUTOTUNE
+# train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+# val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 # prepare optimizer
 optimizer = SGD(lr=LR, momentum=MOMENTUM, decay=LR / NUM_EPOCHS)
 
 # compile model
 model.compile(
-    loss="categorical_crossentropy",
+    loss="sparse_categorical_crossentropy",
     optimizer=optimizer,
-    metrics=["accuracy", "precision", "recall"],
+    metrics=["accuracy"],
 )
+
+# model.summary()
 
 # create callback
 cp_callback = ModelCheckpoint(
@@ -126,7 +127,3 @@ sns.lineplot(x=xs, y=training.history["loss"], title="loss")
 sns.lineplot(x=xs, y=training.history["val_loss"], title="val_loss")
 sns.lineplot(x=xs, y=training.history["accuracy"], title="accuracy")
 sns.lineplot(x=xs, y=training.history["val_accuracy"], title="val_accuracy")
-sns.lineplot(x=xs, y=training.history["precision"], title="precision")
-sns.lineplot(x=xs, y=training.history["val_precision"], title="val_precision")
-sns.lineplot(x=xs, y=training.history["recall"], title="recall")
-sns.lineplot(x=xs, y=training.history["val_recall"], title="val_recall")

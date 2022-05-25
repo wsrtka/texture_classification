@@ -52,4 +52,4 @@ def resize_images(img_dir: pathlib.Path, size: tuple[int], img_format: str = "JP
 
 if __name__ == "__main__":
     imdir, _ = get_dataset("dtd")
-    resize_images(imdir, (300, 300))
+    resize_images(imdir, (150, 150))
