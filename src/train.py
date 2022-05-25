@@ -7,12 +7,13 @@ import seaborn as sns
 import numpy as np
 import tensorflow as tf
 
-from sklearn.metrics import classification_report
 from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.python.compiler.mlcompute import mlcompute
 
 from src.models import vgg
 from src.utils.data import get_dataset
+from src.utils.visualize import show_dataset
 
 
 # initialize parser
@@ -91,6 +92,8 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     batch_size=BATCH_SIZE,
 )
 
+show_dataset(train_ds)
+
 # configure dataset for performance
 AUTOTUNE = tf.data.AUTOTUNE
 train_ds.cache().prefetch(buffer_size=AUTOTUNE)
@@ -98,17 +101,36 @@ val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 # prepare optimizer
 optimizer = SGD(lr=LR, momentum=MOMENTUM, decay=LR / NUM_EPOCHS)
+
+# compile model
 model.compile(
-    loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
+    loss="categorical_crossentropy",
+    optimizer=optimizer,
+    metrics=["accuracy", "precision", "recall"],
 )
 
-training = model.fit_generator()
-preds = model.predict()
-print(classification_report())
+# create callback
+cp_callback = ModelCheckpoint(
+    filepath="checkpoints/cp-{epoch:04d}.ckpt",
+    verbose=1,
+    save_weights_only=True,
+    save_freq=5 * BATCH_SIZE,
+)
 
-xs = np.arange(0, NUM_CLASSES)
+# train model
+training = model.fit(train_ds, validation_data=val_ds, epochs=NUM_EPOCHS)
+
+# save model
+model.save(f'models/{args["model"]}')
+
+# plot results
+xs = np.arange(0, NUM_EPOCHS)
 
 sns.lineplot(x=xs, y=training.history["loss"], title="loss")
 sns.lineplot(x=xs, y=training.history["val_loss"], title="val_loss")
 sns.lineplot(x=xs, y=training.history["accuracy"], title="accuracy")
 sns.lineplot(x=xs, y=training.history["val_accuracy"], title="val_accuracy")
+sns.lineplot(x=xs, y=training.history["precision"], title="precision")
+sns.lineplot(x=xs, y=training.history["val_precision"], title="val_precision")
+sns.lineplot(x=xs, y=training.history["recall"], title="recall")
+sns.lineplot(x=xs, y=training.history["val_recall"], title="val_recall")
