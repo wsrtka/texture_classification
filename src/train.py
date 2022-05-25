@@ -9,7 +9,6 @@ import tensorflow as tf
 
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.python.compiler.mlcompute import mlcompute
 
 from src.models import vgg
 from src.utils.data import get_dataset
@@ -42,11 +41,8 @@ logger.info("Running on tensorflow v%s", tf.__version__)
 
 # tensorflow settings
 tf.compat.v1.disable_eager_execution()
-mlcompute.set_mlc_device(device_name="gpu")
 
 # log tensorflow settings
-logger.info("Apple MLC enabled: %s", mlcompute.is_apple_mlc_enabled())
-logger.info("Compiled with Apple MLC: %s", mlcompute.is_tf_compiled_with_apple_mlc())
 logger.info("Eager excecution: %s", tf.executing_eagerly())
 logger.info("Listing logical devices:")
 logger.info(tf.config.list_logical_devices())
