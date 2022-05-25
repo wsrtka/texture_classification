@@ -7,6 +7,7 @@ from tensorflow.keras.layers import (
     Flatten,
     Dense,
     Dropout,
+    Rescaling,
 )
 from tensorflow.keras.models import Sequential
 
@@ -16,6 +17,8 @@ class VGG16(tf.keras.Model):
 
     def __init__(self, input_dims, num_classes):
         super().__init__()
+
+        self.rescale = Rescaling(1.0 / 255)
 
         # conv layer 1
         self.conv1 = Sequential(
@@ -85,7 +88,8 @@ class VGG16(tf.keras.Model):
 
     def call(self, inputs):
         """Get prediction from model."""
-        x = self.conv1(inputs)
+        x = self.rescale(inputs)
+        x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
         x = self.conv4(x)
