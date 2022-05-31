@@ -12,6 +12,70 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.models import Sequential
 
 
+class AlexNet(tf.keras.Model):
+    """Implementation of AlexNet architecture."""
+
+    def __init__(self, input_dims, num_classes):
+        super().__init__()
+
+        self.rescale = Rescaling(1.0 / 255)
+
+        # conv layer 1
+        self.conv1 = Sequential(
+            [
+                Conv2D(
+                    filters=96,
+                    kernel_size=11,
+                    stride=4,
+                    activation="relu",
+                    padding="same",
+                    input_shape=input_dims,
+                ),
+                MaxPool2D(pool_size=(3, 3), strides=(2, 2)),
+            ]
+        )
+
+        # conv layer 2
+        self.conv2 = Sequential(
+            [
+                Conv2D(filters=256, kernel_size=5, activation="relu", padding="same"),
+                MaxPool2D(pool_size=(3, 3), strides=(2, 2)),
+            ]
+        )
+
+        # conv layer 3
+        self.conv3 = Sequential(
+            [
+                Conv2D(filters=384, kernel_size=3, activation="relu", padding="same"),
+                Conv2D(filters=384, kernel_size=3, activation="relu", padding="same"),
+                Conv2D(filters=256, kernel_size=3, activation="relu", padding="same"),
+                MaxPool2D(pool_size=(3, 3), strides=(2, 2)),
+            ]
+        )
+
+        # classifier
+        self.classifier = Sequential(
+            [
+                Flatten(),
+                Dense(4096, activation="relu"),
+                Dropout(0.5),
+                Dense(4096, activation="relu"),
+                Dropout(0.5),
+                Dense(num_classes, activation="softmax"),
+            ]
+        )
+
+    def call(self, inputs):
+        """Get prediction from model."""
+        x = self.rescale(inputs)
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        x = self.classifier(x)
+
+        return x
+
+
 class VGG16(tf.keras.Model):
     """Implementation of VGG16 architecture."""
 
