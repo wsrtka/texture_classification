@@ -10,7 +10,7 @@ from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import ModelCheckpoint
 
 # pylint: disable=no-name-in-module
-from src.models import VGG16
+from src.models import VGG16, AlexNet
 from src.utils.data import get_dataset
 
 # from src.utils.visualize import show_dataset
@@ -23,7 +23,7 @@ parser.add_argument(
     "--model",
     type=str,
     default="vgg",
-    choices=["vgg"],
+    choices=["vgg", "alexnet"],
     help="Type of model architecture to train.",
 )
 parser.add_argument(
@@ -62,6 +62,8 @@ NUM_CLASSES = 47
 # choose and print model
 if args["model"] == "vgg":
     model = VGG16(INPUT_DIMS, NUM_CLASSES)
+elif args["model"] == "alexnet":
+    model = AlexNet(INPUT_DIMS, NUM_CLASSES)
 
 # load dataset
 data_dir, img_count = get_dataset(args["dataset"])
