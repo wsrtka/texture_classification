@@ -9,7 +9,8 @@ import tensorflow as tf
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-from src.models import vgg
+# pylint: disable=no-name-in-module
+from src.models import VGG16
 from src.utils.data import get_dataset
 
 # from src.utils.visualize import show_dataset
@@ -60,7 +61,7 @@ NUM_CLASSES = 47
 
 # choose and print model
 if args["model"] == "vgg":
-    model = vgg.VGG16(INPUT_DIMS, NUM_CLASSES)
+    model = VGG16(INPUT_DIMS, NUM_CLASSES)
 
 # load dataset
 data_dir, img_count = get_dataset(args["dataset"])
