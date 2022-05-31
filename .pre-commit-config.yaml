@@ -9,7 +9,7 @@ repos:
 -   repo: https://github.com/psf/black 
     rev: 22.3.0
     hooks:
-    -   id: black-jupyter
+    -   id: black
 -   repo: https://github.com/PyCQA/pylint
     rev: v2.13.8
     hooks:
@@ -18,3 +18,4 @@ repos:
     rev: 4.0.1
     hooks:
     -   id: flake8
+        args: ['--max-line-length=89']
