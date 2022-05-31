@@ -26,7 +26,7 @@ class AlexNet(tf.keras.Model):
                 Conv2D(
                     filters=96,
                     kernel_size=11,
-                    stride=4,
+                    strides=4,
                     activation="relu",
                     padding="same",
                     input_shape=input_dims,

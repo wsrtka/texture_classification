@@ -53,7 +53,7 @@ logger.info(tf.config.list_logical_devices())
 LR = 1e-2
 MOMENTUM = 0.9
 BATCH_SIZE = 64
-NUM_EPOCHS = 60
+NUM_EPOCHS = 100
 # todo: move this into __init__.py and adjust according to dataset
 # (add option in argparser for this also)
 INPUT_DIMS = (150, 150, 3)
