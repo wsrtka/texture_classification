@@ -10,7 +10,7 @@ from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import ModelCheckpoint
 
 # pylint: disable=no-name-in-module
-from src.models import VGG16, AlexNet
+from src.models import VGG16, AlexNet, get_wavelet_cnn_model
 from src.utils.data import get_dataset
 
 # from src.utils.visualize import show_dataset
@@ -23,7 +23,7 @@ parser.add_argument(
     "--model",
     type=str,
     default="vgg",
-    choices=["vgg", "alexnet"],
+    choices=["vgg", "alexnet", "wavelet"],
     help="Type of model architecture to train.",
 )
 parser.add_argument(
@@ -56,14 +56,8 @@ BATCH_SIZE = 64
 NUM_EPOCHS = 100
 # todo: move this into __init__.py and adjust according to dataset
 # (add option in argparser for this also)
-INPUT_DIMS = (150, 150, 3)
+INPUT_DIMS = (300, 300, 3)
 NUM_CLASSES = 47
-
-# choose and print model
-if args["model"] == "vgg":
-    model = VGG16(INPUT_DIMS, NUM_CLASSES)
-elif args["model"] == "alexnet":
-    model = AlexNet(INPUT_DIMS, NUM_CLASSES)
 
 # load dataset
 data_dir, img_count = get_dataset(args["dataset"])
@@ -71,6 +65,14 @@ logger.info("Loaded dataset with %d images", img_count)
 
 if args["dataset"] == "dtd":
     data_dir = data_dir / "images"
+
+# choose and print model
+if args["model"] == "vgg":
+    model = VGG16(INPUT_DIMS, NUM_CLASSES)
+elif args["model"] == "alexnet":
+    model = AlexNet(INPUT_DIMS, NUM_CLASSES)
+elif args["model"] == "wavelet":
+    model = get_wavelet_cnn_model(INPUT_DIMS, NUM_CLASSES)
 
 # split dataset
 train_ds = tf.keras.utils.image_dataset_from_directory(
@@ -128,7 +130,7 @@ model.save(f'models/{args["model"]}')
 # plot results
 xs = np.arange(0, NUM_EPOCHS)
 
-sns.lineplot(x=xs, y=training.history["loss"], title="loss")
-sns.lineplot(x=xs, y=training.history["val_loss"], title="val_loss")
-sns.lineplot(x=xs, y=training.history["accuracy"], title="accuracy")
-sns.lineplot(x=xs, y=training.history["val_accuracy"], title="val_accuracy")
+sns.lineplot(x=xs, y=training.history["loss"])
+sns.lineplot(x=xs, y=training.history["val_loss"])
+sns.lineplot(x=xs, y=training.history["accuracy"])
+sns.lineplot(x=xs, y=training.history["val_accuracy"])
